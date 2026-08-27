@@ -1,0 +1,28 @@
+# Arduino / PlatformIO build artifacts
+build/
+.build/
+*.bin
+*.elf
+*.hex
+*.map
+
+# Arduino IDE
+*.o
+*.a
+*.d
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+*~
+
+# Secrets (if you ever split credentials into a separate header)
+secrets.h
+arduino_secrets.h

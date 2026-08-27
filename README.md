@@ -1,0 +1,239 @@
+# 🌬️ CO₂ Monitor with WiFi + MQTT — ESP32 & SCD30
+
+> Read real-time **CO₂**, **temperature**, and **humidity** from a Sensirion **SCD30** sensor, classify the air quality, and stream everything to an **MQTT broker** as clean JSON.
+
+<p align="center">
+  <img alt="Platform" src="https://img.shields.io/badge/Platform-ESP32-000000?logo=espressif&logoColor=white">
+  <img alt="Sensor" src="https://img.shields.io/badge/Sensor-Sensirion%20SCD30-00A6A6">
+  <img alt="Protocol" src="https://img.shields.io/badge/Protocol-MQTT-660066?logo=mqtt&logoColor=white">
+  <img alt="Framework" src="https://img.shields.io/badge/Framework-Arduino-00979D?logo=arduino&logoColor=white">
+  <img alt="Language" src="https://img.shields.io/badge/Language-C%2FC%2B%2B-blue">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green">
+</p>
+
+---
+
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Hardware Required](#-hardware-required)
+- [Wiring](#-wiring)
+- [Software & Libraries](#-software--libraries)
+- [Configuration](#-configuration)
+- [MQTT JSON Payload](#-mqtt-json-payload)
+- [Air Quality Levels](#-air-quality-levels)
+- [Getting Started](#-getting-started)
+- [Testing the Stream](#-testing-the-stream)
+- [Project Structure](#-project-structure)
+- [Troubleshooting](#-troubleshooting)
+- [License](#-license)
+
+---
+
+## 🔎 Overview
+
+This project turns an **ESP32** and a **Sensirion SCD30** NDIR sensor into a
+connected air-quality node. Every few seconds the ESP32:
+
+1. Reads **CO₂ (ppm)**, **temperature (°C)**, and **relative humidity (%)**.
+2. Classifies the reading into a human-readable **air quality level**.
+3. Stamps it with a real **UTC timestamp** synced over **NTP**.
+4. Publishes a compact **JSON** message to an **MQTT** topic for your dashboard,
+   database, or automation to consume.
+
+```mermaid
+flowchart LR
+    A[SCD30 Sensor] -->|I²C| B[ESP32]
+    B -->|WiFi| C{{MQTT Broker\nmqtt.iotbhai.io}}
+    C --> D[Dashboard / DB / Automation]
+    E[(NTP Server)] -.->|UTC time| B
+```
+
+---
+
+## ✨ Features
+
+- 📡 **WiFi + MQTT** publishing with automatic reconnect for both links
+- 🧾 **Structured JSON** payload (device id, timestamp, all sensor values, air quality text)
+- ⏱️ **Real UTC timestamps** via NTP (`configTime`) — no RTC needed
+- 🟢 **Air quality classification** across 7 levels (Excellent → Danger)
+- ⚙️ **Non-blocking loop** using `millis()` — the MQTT client stays responsive
+- 🔧 **Single-file, fully configurable** sketch — edit the config block and flash
+
+---
+
+## 🧰 Hardware Required
+
+| Component | Notes |
+|---|---|
+| ESP32 Dev Board | Any ESP32 (DevKitC, WROOM, WROVER, …) |
+| Sensirion SCD30 | I²C CO₂ / temperature / humidity sensor |
+| Jumper wires | 4 × female-to-female |
+| USB cable | For flashing & power |
+
+---
+
+## 🔌 Wiring
+
+The SCD30 talks to the ESP32 over **I²C** and runs at **3.3 V**.
+
+| SCD30 Pin | ESP32 Pin | Description |
+|:---:|:---:|:---|
+| `VIN` | `3V3` | Power (3.3 V) |
+| `GND` | `GND` | Ground |
+| `SCL` | `GPIO22` | I²C clock |
+| `SDA` | `GPIO21` | I²C data |
+
+> 💡 GPIO21/GPIO22 are the ESP32's default I²C pins used by `Wire.begin()`.
+
+---
+
+## 📚 Software & Libraries
+
+- **[Arduino IDE](https://www.arduino.cc/en/software)** (or Arduino CLI) with the **ESP32 board package** installed.
+- Install these via **Library Manager**:
+
+| Library | Author |
+|---|---|
+| Adafruit SCD30 | Adafruit |
+| PubSubClient | Nick O'Leary |
+| ArduinoJson (v6.x) | Benoit Blanchon |
+
+---
+
+## ⚙️ Configuration
+
+All settings live in the `USER CONFIGURATION` block at the top of the sketch:
+
+```cpp
+// --- WiFi ---
+const char* WIFI_SSID     = "YOUR_WIFI_SSID";
+const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+
+// --- MQTT broker ---
+const char* MQTT_HOST     = "mqtt.iotbhai.io";
+const uint16_t MQTT_PORT  = 1883;
+const char* MQTT_USER     = "";                 // leave "" for no auth
+const char* MQTT_PASSWORD = "";
+const char* MQTT_TOPIC    = "iotbhai/co2/data";
+
+// --- Device identity ---
+const char* DEVICE_ID     = "esp32-co2-01";     // also used as MQTT client id
+
+// --- NTP ---
+const long GMT_OFFSET_SEC = 0;                  // 0 = UTC. GMT+6 → 6*3600
+```
+
+> ⏰ To publish **local** time instead of UTC, set `GMT_OFFSET_SEC` (e.g. `6 * 3600` for GMT+6).
+
+---
+
+## 📦 MQTT JSON Payload
+
+Published to `iotbhai/co2/data` every `PUBLISH_INTERVAL_MS` (default **5 s**):
+
+```json
+{
+  "device_id": "esp32-co2-01",
+  "timestamp": 1724740800,
+  "co2_ppm": 712.4,
+  "temperature_c": 24.31,
+  "humidity_pct": 46.87,
+  "air_quality": "Acceptable level (Fair)"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `device_id` | string | Unique device identifier |
+| `timestamp` | number | Unix epoch **seconds** (UTC); `0` until NTP syncs |
+| `co2_ppm` | number | CO₂ concentration in ppm |
+| `temperature_c` | number | Temperature in °C |
+| `humidity_pct` | number | Relative humidity in % |
+| `air_quality` | string | Human-readable air quality level |
+
+---
+
+## 🟢 Air Quality Levels
+
+| CO₂ (ppm) | Level |
+|---:|:---|
+| ≤ 350 | 🟢 Healthy outside air level (Excellent) |
+| ≤ 600 | 🟢 Healthy indoor climate (Good) |
+| ≤ 800 | 🟡 Acceptable level (Fair) |
+| ≤ 1000 | 🟠 Ventilation required (Poor) |
+| ≤ 1200 | 🟠 Ventilation necessary (Bad) |
+| ≤ 2500 | 🔴 Negative health effects (Very Bad) |
+| > 2500 | ⚫ HAZARDOUS PROLONGED EXPOSURE (DANGER) |
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone** this repository.
+2. Open `CO2_Monitor_WiFi_MQTT_ESP32_SCD30.ino` in the Arduino IDE.
+   > If prompted, allow the IDE to place the `.ino` inside a folder of the same name.
+3. Install the three libraries listed above.
+4. Fill in your **WiFi** credentials in the config block.
+5. Select your **ESP32 board** and **COM port**.
+6. **Upload**, then open the **Serial Monitor** at **115200 baud**.
+
+Expected serial output:
+
+```
+CO2 Monitor (WiFi + MQTT) Initializing...
+SCD30 sensor found!
+Connecting to WiFi "..." .... connected. IP: 192.168.1.42
+NTP time sync requested.
+Connecting to MQTT broker... connected.
+Publish to "iotbhai/co2/data" OK: {"device_id":"esp32-co2-01",...}
+```
+
+---
+
+## 🧪 Testing the Stream
+
+Subscribe from any machine with [Mosquitto](https://mosquitto.org/) installed:
+
+```bash
+mosquitto_sub -h mqtt.iotbhai.io -t iotbhai/co2/data -v
+```
+
+You should see a new JSON line every few seconds.
+
+---
+
+## 🗂️ Project Structure
+
+```
+4. CO2_Monitor_WiFi_MQTT_ESP32_SCD30/
+├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30.ino   # Main firmware
+├── README.md                                # This file
+├── LICENSE                                  # MIT license
+└── .gitignore
+```
+
+---
+
+## 🛠️ Troubleshooting
+
+| Symptom | Likely cause / fix |
+|---|---|
+| `Failed to find SCD30 sensor` | Check wiring & 3.3 V power; confirm I²C address `0x61` |
+| Stuck on `Connecting to WiFi ...` | Wrong SSID/password, or 5 GHz-only network (ESP32 is 2.4 GHz) |
+| MQTT `rc=-2` / keeps retrying | Broker host/port unreachable, or firewall blocking 1883 |
+| `timestamp` stays `0` | NTP not reachable yet — give it a few seconds after WiFi connects |
+| No data published | Sensor needs a moment to produce its first reading after boot |
+
+---
+
+## 📄 License
+
+Released under the [MIT License](LICENSE).
+
+---
+
+<p align="center">
+  Made with ❤️ by <b>IoT Bhai</b> · Part of the <i>Full IoT Project</i> series
+</p>
