@@ -25,6 +25,7 @@
 - [Air Quality Levels](#-air-quality-levels)
 - [Getting Started](#-getting-started)
 - [Testing the Stream](#-testing-the-stream)
+- [Dashboard with mqttbhai App](#-dashboard-with-mqttbhai-app)
 - [Project Structure](#-project-structure)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
@@ -201,6 +202,63 @@ mosquitto_sub -h mqtt.iotbhai.io -t iotbhai/co2/data -v
 ```
 
 You should see a new JSON line every few seconds.
+
+---
+
+## 📱 Dashboard with mqttbhai App
+
+Prefer a visual dashboard over the terminal? Use the **mqttbhai** app to
+subscribe to the same broker and turn the live JSON into gauges and charts.
+
+### 1. Connect to the broker
+
+In the app, create a new broker connection with these settings:
+
+| Setting | Value |
+|---|---|
+| Broker / Host | `mqtt.iotbhai.io` |
+| Port | `1883` |
+| Client ID | any unique value (e.g. `mqttbhai-dashboard`) |
+| Username / Password | *(leave blank)* |
+| TLS / SSL | Off |
+
+> ⚠️ Use a **different** Client ID than the ESP32 (`esp32-co2-01`). MQTT brokers
+> disconnect the older client when two connect with the same ID.
+
+### 2. Subscribe to the topic
+
+Add a subscription to:
+
+```
+iotbhai/co2/data
+```
+
+The device publishes one JSON message here every ~5 seconds.
+
+### 3. Map JSON fields to widgets
+
+The payload is JSON, so point each widget at the matching **JSON key**:
+
+| Widget | JSON key | Suggested type | Unit / Notes |
+|---|---|---|---|
+| CO₂ | `co2_ppm` | Gauge / line chart | ppm (range 400–2500) |
+| Temperature | `temperature_c` | Gauge / value | °C |
+| Humidity | `humidity_pct` | Gauge / value | % |
+| Air Quality | `air_quality` | Text / label | Human-readable level |
+| Last Seen | `timestamp` | Text / value | Unix epoch seconds (UTC) |
+| Device | `device_id` | Text / label | Identifies the node |
+
+> 💡 If a widget expects a raw number instead of JSON, enable the widget's
+> **JSON path / key** option and set it to the field name above (e.g. `co2_ppm`).
+
+### 4. Suggested layout
+
+- A **CO₂ gauge** front-and-center (color zones matching the
+  [air quality levels](#-air-quality-levels): green ≤ 600, yellow ≤ 800,
+  orange ≤ 1200, red above).
+- **Temperature** and **Humidity** as smaller value tiles.
+- An **Air Quality** text label so the status reads at a glance.
+- A **CO₂ line chart** to watch the trend over time (e.g. when a room fills up).
 
 ---
 
