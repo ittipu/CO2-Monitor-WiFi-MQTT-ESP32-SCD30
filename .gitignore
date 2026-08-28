@@ -16,6 +16,10 @@ build/
 .pioenvs/
 .piolibdeps/
 
+# Fritzing source (keep only the exported .png in the repo)
+*.fzz
+*.fzz.bak
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db

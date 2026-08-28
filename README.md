@@ -79,6 +79,10 @@ flowchart LR
 
 The SCD30 talks to the ESP32 over **I²C** and runs at **3.3 V**.
 
+<p align="center">
+  <img src="CO2_Monitor_WiFi_MQTT_ESP32_SCD30_bb.png" alt="ESP32 + SCD30 wiring diagram" width="600">
+</p>
+
 | SCD30 Pin | ESP32 Pin | Description |
 |:---:|:---:|:---|
 | `VIN` | `3V3` | Power (3.3 V) |
@@ -266,9 +270,10 @@ The payload is JSON, so point each widget at the matching **JSON key**:
 
 ```
 4. CO2_Monitor_WiFi_MQTT_ESP32_SCD30/
-├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30.ino   # Main firmware
-├── README.md                                # This file
-├── LICENSE                                  # MIT license
+├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30.ino     # Main firmware
+├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30_bb.png  # Fritzing wiring diagram
+├── README.md                                  # This file
+├── LICENSE                                    # MIT license
 └── .gitignore
 ```
 
