@@ -9,7 +9,7 @@
  * {
  *   "device_id":   "ib_sen1",
  *   "timestamp":   1724740800,          // Unix epoch seconds (UTC, from NTP)
- *   "co2":         712.4,
+ *   "co2":         712.40,
  *   "temp":        24.31,
  *   "hum":         46.87,
  *   "air_quality": "Acceptable level (Fair)"
@@ -126,9 +126,9 @@ void publishReading() {
   StaticJsonDocument<256> doc;
   doc["device_id"]   = DEVICE_ID;
   doc["timestamp"]   = getEpochTime();
-  doc["co2"]         = co2;
-  doc["temp"]        = temp;
-  doc["hum"]         = hum;
+  doc["co2"]         = serialized(String(co2, 2));   // fixed 2 decimals
+  doc["temp"]        = serialized(String(temp, 2));
+  doc["hum"]         = serialized(String(hum, 2));
   doc["air_quality"] = quality;
 
   char payload[256];

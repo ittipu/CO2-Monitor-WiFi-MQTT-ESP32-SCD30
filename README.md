@@ -142,7 +142,7 @@ Published to `iotbhai/co2` every `PUBLISH_INTERVAL_MS` (default **5 s**):
 {
   "device_id": "ib_sen1",
   "timestamp": 1724740800,
-  "co2": 712.4,
+  "co2": 712.40,
   "temp": 24.31,
   "hum": 46.87,
   "air_quality": "Acceptable level (Fair)"
