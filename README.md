@@ -73,6 +73,14 @@ flowchart LR
 | Jumper wires | 4 × female-to-female |
 | USB cable | For flashing & power |
 
+### 🛒 Components Used (buy the parts)
+
+- **ESP32 Development Board** — [Amazon](https://amzn.to/493Wv5A) · [AliExpress](https://s.click.aliexpress.com/e/_c2IAMVUX)
+- **Sensirion SCD30 (NDIR CO₂ Sensor)** — [Amazon](https://amzn.to/4d6peIH) · [AliExpress](https://s.click.aliexpress.com/e/_c34JGRGP)
+- **Jumper Wires**
+
+> _The links above are affiliate links — buying through them supports the channel at no extra cost to you._
+
 ---
 
 ## 🔌 Wiring
