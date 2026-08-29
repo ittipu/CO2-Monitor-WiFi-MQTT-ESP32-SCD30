@@ -308,6 +308,17 @@ The payload is JSON, so point each widget at the matching **JSON key**:
 
 ---
 
+## 🎥 Related Videos
+
+- ▶️ [SCD30 Sensor Interfacing with ESP32](https://www.youtube.com/watch?v=1PDmTFU3ZYc) — the basics: wiring, libraries, reading CO₂ on the Serial Monitor
+- ▶️ [Set up an MQTT Broker on a Raspberry Pi](https://youtu.be/a8SdIrUkVRQ) — host your own broker at home
+- ▶️ [Set up an MQTT Broker on a Cloud VPS](https://youtu.be/jZQ8JD3nSYI) — a public broker like `mqtt.iotbhai.io`
+
+> 💡 Want to use your **own** broker instead of `mqtt.iotbhai.io`? Follow either broker-setup
+> video above, then change `MQTT_HOST` in the sketch.
+
+---
+
 ## 📄 License
 
 Released under the [MIT License](LICENSE).
