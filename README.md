@@ -222,6 +222,14 @@ You should see a new JSON line every few seconds.
 Prefer a visual dashboard over the terminal? Use the **mqttbhai** app to
 subscribe to the same broker and turn the live JSON into gauges and charts.
 
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=io.iotbhai.mqtt&hl=en">
+    <img alt="Get mqttbhai on Google Play" src="https://img.shields.io/badge/Google%20Play-mqttbhai-414141?logo=googleplay&logoColor=white">
+  </a>
+</p>
+
+> 📲 **Get the app:** [mqttbhai on Google Play](https://play.google.com/store/apps/details?id=io.iotbhai.mqtt&hl=en)
+
 ### 1. Connect to the broker
 
 In the app, create a new broker connection with these settings:
