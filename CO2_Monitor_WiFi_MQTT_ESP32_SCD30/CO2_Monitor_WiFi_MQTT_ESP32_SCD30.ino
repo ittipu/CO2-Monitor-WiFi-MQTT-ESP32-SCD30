@@ -7,11 +7,11 @@
  *
  * Published JSON payload:
  * {
- *   "device_id":   "esp32-co2-01",
+ *   "device_id":   "ib_sen1",
  *   "timestamp":   1724740800,          // Unix epoch seconds (UTC, from NTP)
- *   "co2_ppm":     712.4,
- *   "temperature_c": 24.31,
- *   "humidity_pct":  46.87,
+ *   "co2":         712.4,
+ *   "temp":        24.31,
+ *   "hum":         46.87,
  *   "air_quality": "Acceptable level (Fair)"
  * }
  *
@@ -30,18 +30,18 @@
 
 // ==================== USER CONFIGURATION ====================
 // --- WiFi ---
-const char* WIFI_SSID     = "YOUR_WIFI_SSID";
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID     = "tipu_pc";
+const char* WIFI_PASSWORD = "tipu1234@";
 
 // --- MQTT broker ---
 const char* MQTT_HOST     = "mqtt.iotbhai.io";     // e.g. your broker IP or hostname
 const uint16_t MQTT_PORT  = 1883;
 const char* MQTT_USER     = "";                    // leave "" if broker needs no auth
 const char* MQTT_PASSWORD = "";
-const char* MQTT_TOPIC    = "iotbhai/co2/data";    // topic to publish to
+const char* MQTT_TOPIC    = "iotbhai/co2";         // topic to publish to
 
 // --- Device identity ---
-const char* DEVICE_ID     = "esp32-co2-01";
+const char* DEVICE_ID     = "ib_sen1";
 
 // --- NTP (for real timestamps) ---
 const char* NTP_SERVER    = "pool.ntp.org";
@@ -124,12 +124,12 @@ void publishReading() {
 
   // Build the JSON payload.
   StaticJsonDocument<256> doc;
-  doc["device_id"]     = DEVICE_ID;
-  doc["timestamp"]     = getEpochTime();
-  doc["co2_ppm"]       = co2;
-  doc["temperature_c"] = temp;
-  doc["humidity_pct"]  = hum;
-  doc["air_quality"]   = quality;
+  doc["device_id"]   = DEVICE_ID;
+  doc["timestamp"]   = getEpochTime();
+  doc["co2"]         = co2;
+  doc["temp"]        = temp;
+  doc["hum"]         = hum;
+  doc["air_quality"] = quality;
 
   char payload[256];
   size_t n = serializeJson(doc, payload, sizeof(payload));

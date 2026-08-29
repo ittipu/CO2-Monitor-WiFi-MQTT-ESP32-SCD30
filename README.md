@@ -121,10 +121,10 @@ const char* MQTT_HOST     = "mqtt.iotbhai.io";
 const uint16_t MQTT_PORT  = 1883;
 const char* MQTT_USER     = "";                 // leave "" for no auth
 const char* MQTT_PASSWORD = "";
-const char* MQTT_TOPIC    = "iotbhai/co2/data";
+const char* MQTT_TOPIC    = "iotbhai/co2";
 
 // --- Device identity ---
-const char* DEVICE_ID     = "esp32-co2-01";     // also used as MQTT client id
+const char* DEVICE_ID     = "ib_sen1";          // also used as MQTT client id
 
 // --- NTP ---
 const long GMT_OFFSET_SEC = 0;                  // 0 = UTC. GMT+6 → 6*3600
@@ -136,15 +136,15 @@ const long GMT_OFFSET_SEC = 0;                  // 0 = UTC. GMT+6 → 6*3600
 
 ## 📦 MQTT JSON Payload
 
-Published to `iotbhai/co2/data` every `PUBLISH_INTERVAL_MS` (default **5 s**):
+Published to `iotbhai/co2` every `PUBLISH_INTERVAL_MS` (default **5 s**):
 
 ```json
 {
-  "device_id": "esp32-co2-01",
+  "device_id": "ib_sen1",
   "timestamp": 1724740800,
-  "co2_ppm": 712.4,
-  "temperature_c": 24.31,
-  "humidity_pct": 46.87,
+  "co2": 712.4,
+  "temp": 24.31,
+  "hum": 46.87,
   "air_quality": "Acceptable level (Fair)"
 }
 ```
@@ -153,9 +153,9 @@ Published to `iotbhai/co2/data` every `PUBLISH_INTERVAL_MS` (default **5 s**):
 |---|---|---|
 | `device_id` | string | Unique device identifier |
 | `timestamp` | number | Unix epoch **seconds** (UTC); `0` until NTP syncs |
-| `co2_ppm` | number | CO₂ concentration in ppm |
-| `temperature_c` | number | Temperature in °C |
-| `humidity_pct` | number | Relative humidity in % |
+| `co2` | number | CO₂ concentration in ppm |
+| `temp` | number | Temperature in °C |
+| `hum` | number | Relative humidity in % |
 | `air_quality` | string | Human-readable air quality level |
 
 ---
@@ -192,7 +192,7 @@ SCD30 sensor found!
 Connecting to WiFi "..." .... connected. IP: 192.168.1.42
 NTP time sync requested.
 Connecting to MQTT broker... connected.
-Publish to "iotbhai/co2/data" OK: {"device_id":"esp32-co2-01",...}
+Publish to "iotbhai/co2" OK: {"device_id":"ib_sen1",...}
 ```
 
 ---
@@ -202,7 +202,7 @@ Publish to "iotbhai/co2/data" OK: {"device_id":"esp32-co2-01",...}
 Subscribe from any machine with [Mosquitto](https://mosquitto.org/) installed:
 
 ```bash
-mosquitto_sub -h mqtt.iotbhai.io -t iotbhai/co2/data -v
+mosquitto_sub -h mqtt.iotbhai.io -t iotbhai/co2 -v
 ```
 
 You should see a new JSON line every few seconds.
@@ -226,7 +226,7 @@ In the app, create a new broker connection with these settings:
 | Username / Password | *(leave blank)* |
 | TLS / SSL | Off |
 
-> ⚠️ Use a **different** Client ID than the ESP32 (`esp32-co2-01`). MQTT brokers
+> ⚠️ Use a **different** Client ID than the ESP32 (`ib_sen1`). MQTT brokers
 > disconnect the older client when two connect with the same ID.
 
 ### 2. Subscribe to the topic
@@ -234,7 +234,7 @@ In the app, create a new broker connection with these settings:
 Add a subscription to:
 
 ```
-iotbhai/co2/data
+iotbhai/co2
 ```
 
 The device publishes one JSON message here every ~5 seconds.
@@ -245,15 +245,15 @@ The payload is JSON, so point each widget at the matching **JSON key**:
 
 | Widget | JSON key | Suggested type | Unit / Notes |
 |---|---|---|---|
-| CO₂ | `co2_ppm` | Gauge / line chart | ppm (range 400–2500) |
-| Temperature | `temperature_c` | Gauge / value | °C |
-| Humidity | `humidity_pct` | Gauge / value | % |
+| CO₂ | `co2` | Gauge / line chart | ppm (range 400–2500) |
+| Temperature | `temp` | Gauge / value | °C |
+| Humidity | `hum` | Gauge / value | % |
 | Air Quality | `air_quality` | Text / label | Human-readable level |
 | Last Seen | `timestamp` | Text / value | Unix epoch seconds (UTC) |
 | Device | `device_id` | Text / label | Identifies the node |
 
 > 💡 If a widget expects a raw number instead of JSON, enable the widget's
-> **JSON path / key** option and set it to the field name above (e.g. `co2_ppm`).
+> **JSON path / key** option and set it to the field name above (e.g. `co2`).
 
 ### 4. Suggested layout
 
@@ -270,10 +270,11 @@ The payload is JSON, so point each widget at the matching **JSON key**:
 
 ```
 4. CO2_Monitor_WiFi_MQTT_ESP32_SCD30/
-├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30.ino     # Main firmware
-├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30_bb.png  # Fritzing wiring diagram
-├── README.md                                  # This file
-├── LICENSE                                    # MIT license
+├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30/
+│   └── CO2_Monitor_WiFi_MQTT_ESP32_SCD30.ino  # Main firmware (Arduino sketch)
+├── CO2_Monitor_WiFi_MQTT_ESP32_SCD30_bb.png   # Fritzing wiring diagram
+├── README.md                                   # This file
+├── LICENSE                                     # MIT license
 └── .gitignore
 ```
 
