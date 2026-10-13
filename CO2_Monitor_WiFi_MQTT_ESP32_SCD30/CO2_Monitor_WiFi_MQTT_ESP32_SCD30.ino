@@ -30,8 +30,8 @@
 
 // ==================== USER CONFIGURATION ====================
 // --- WiFi ---
-const char* WIFI_SSID     = "tipu_pc";
-const char* WIFI_PASSWORD = "tipu1234@";
+const char* WIFI_SSID     = "YOUR_WIFI_SSID";
+const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
 // --- MQTT broker ---
 const char* MQTT_HOST     = "mqtt.iotbhai.io";     // e.g. your broker IP or hostname
